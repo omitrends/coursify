@@ -11,7 +11,7 @@ const app = express();//express cha app bnavla
 
 // Enable CORS for all routes
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://coursify-frontend.vercel.app', 'https://coursify-git-main-your-username.vercel.app', 'https://coursify.vercel.app'],
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
     credentials: true
 }));
 

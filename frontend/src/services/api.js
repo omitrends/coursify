@@ -5,7 +5,7 @@ const isProd = import.meta.env.PROD;
 
 // Set the base URL based on environment
 const api = axios.create({
-  baseURL: isProd ? 'https://coursify-backend.vercel.app' : '',
+  baseURL: isProd ? 'http://localhost:3000' : '',
 });
 
 // Request interceptor to add auth token to requests
