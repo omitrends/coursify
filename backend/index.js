@@ -11,12 +11,16 @@ const app = express();//express cha app bnavla
 
 // Enable CORS for all routes
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: '*', // Allow all origins for now, adjust for production
     credentials: true
 }));
 
 app.use(express.json());//body la parse karta he middle ware
 
+// Health check route
+app.get("/", (req, res) => {
+    res.status(200).send("Server is running!");
+});
 
 app.use("/api/v1/user", userRouter);//apan jar "api/v1/user" la route kela ki userRouter cha function chjalnar
 app.use("/api/v1/admin", adminRouter);
@@ -24,8 +28,10 @@ app.use("/api/v1/course", courseRouter);
 
 async function main() {
     await mongoose.connect(process.env.MONGO_URL)
-    app.listen(3000);
-    console.log("listening on port 3000")
+    const port = process.env.PORT || 3000; // Use Render's port or 3000 locally
+    app.listen(port, () => {
+        console.log(`listening on port ${port}`);
+    });
 }
 
 main()

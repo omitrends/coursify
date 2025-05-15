@@ -5,7 +5,7 @@ const isProd = import.meta.env.PROD;
 
 // Set the base URL based on environment
 const api = axios.create({
-  baseURL: isProd ? 'http://localhost:3000' : '',
+  baseURL: isProd ? 'https://coursify-hjt0.onrender.com' : '',
 });
 
 // Request interceptor to add auth token to requests
