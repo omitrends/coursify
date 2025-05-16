@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { userAPI, adminAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -23,22 +23,29 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password, isAdminLogin = false) => {
     try {
-      const endpoint = isAdminLogin ? '/api/v1/admin/signin' : '/api/v1/user/signin';
-      const response = await axios.post(endpoint, { email, password });
+      const response = isAdminLogin 
+        ? await adminAPI.signin({ email, password })
+        : await userAPI.signin({ email, password });
+      
       setToken(response.data.token);
       setIsAdmin(isAdminLogin);
       return { success: true };
     } catch (error) {
+      console.error('Login error:', error);
       return { success: false, error: error.response?.data?.message || 'Login failed' };
     }
   };
 
   const signup = async (userData, isAdminSignup = false) => {
     try {
-      const endpoint = isAdminSignup ? '/api/v1/admin/signup' : '/api/v1/user/signup';
-      await axios.post(endpoint, userData);
+      if (isAdminSignup) {
+        await adminAPI.signup(userData);
+      } else {
+        await userAPI.signup(userData);
+      }
       return { success: true };
     } catch (error) {
+      console.error('Signup error:', error);
       return { success: false, error: error.response?.data?.message || 'Signup failed' };
     }
   };

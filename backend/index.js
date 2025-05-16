@@ -9,10 +9,25 @@ const { courseRouter } = require("./routes/course");
 const { adminRouter } = require("./routes/admin");
 const app = express();//express cha app bnavla 
 
-// Enable CORS for all routes
+// Define allowed origins
+const allowedOrigins = [
+  'http://localhost:5173',  // Local frontend development
+  'https://coursify-frontend.onrender.com', // Production frontend
+  'https://coursify-frontend-9ihy.onrender.com' // Add your actual Render frontend URL
+];
+
+// CORS configuration
 app.use(cors({
-    origin: '*', // Allow all origins for now, adjust for production
-    credentials: true
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      console.log('CORS blocked origin:', origin);
+      return callback(null, true); // Still allow for debugging, can be changed to false later
+    }
+    return callback(null, true);
+  },
+  credentials: true
 }));
 
 app.use(express.json());//body la parse karta he middle ware
@@ -22,9 +37,24 @@ app.get("/", (req, res) => {
     res.status(200).send("Server is running!");
 });
 
+// Log all requests for debugging
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+});
+
 app.use("/api/v1/user", userRouter);//apan jar "api/v1/user" la route kela ki userRouter cha function chjalnar
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/course", courseRouter);
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        message: 'Something went wrong!',
+        error: process.env.NODE_ENV === 'production' ? 'Server error' : err.message
+    });
+});
 
 async function main() {
     await mongoose.connect(process.env.MONGO_URL)
